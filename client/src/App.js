@@ -45,14 +45,14 @@ function App() {
       <div className="container-xl text-center">
         <div className="row justify-content-center">
           <Routes>
-            <PrivateRoute path="/habits/new" component={<HabitFormPage />} />
+            {/* <PrivateRoute path="/habits/new" component={<HabitFormPage />} />
             <PrivateRoute path="/habits/:id" component={<ShowHabitPage />} />
-            <PrivateRoute path="/" component={<HabitsListPage />} />
+            <PrivateRoute path="/" component={<HabitsListPage />} /> */}
             
-            {/* <Route path="/habits/new" element={<HabitFormPage />} />
-            <Route path="/habits/:id" element={<ShowHabitPage />} />
-            <Route path="/" element={<HabitsListPage />} /> */}
-            
+            <Route path="/habits/new" element={<PrivateRoute><HabitFormPage /></PrivateRoute>} />
+            <Route path="/habits/:id" element={({params}) => {<PrivateRoute callbackURL={params.id}><ShowHabitPage /></PrivateRoute>}} />
+            <Route path="/" element={<PrivateRoute><HabitsListPage /></PrivateRoute>}  />
+              
             <Route path="/about-us" element={<AboutUsPage />} />
             <Route path="/login" element={<LoginPage />} />
           </Routes>

@@ -5,7 +5,6 @@ import {useState} from 'react';
 
 
 export default function LoginPage(props){
-  
   const [error, setError] = useState(false);
 
   async function handleSubmit(e){
@@ -22,13 +21,14 @@ export default function LoginPage(props){
   }
   function ErrorAlert(props){
     return (
-      <div>{props.details}</div>
+      <div class='alert alert-danger'>{props.details}</div>
     )
   }
 
     return (
         <>
       {error && <ErrorAlert details={"Failed to save the content"} />}
+      {document.location.href.includes('loggedout') && <ErrorAlert details={"Log in to view page"} />}
     <form onSubmit={handleSubmit}>
       <div class="form-group">
         <label for="username">Username</label>
