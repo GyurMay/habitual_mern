@@ -49,6 +49,10 @@ function App() {
             <PrivateRoute path="/habits/:id" component={<ShowHabitPage />} />
             <PrivateRoute path="/" component={<HabitsListPage />} />
             
+            {/* <Route path="/habits/new" element={<HabitFormPage />} />
+            <Route path="/habits/:id" element={<ShowHabitPage />} />
+            <Route path="/" element={<HabitsListPage />} /> */}
+            
             <Route path="/about-us" element={<AboutUsPage />} />
             <Route path="/login" element={<LoginPage />} />
           </Routes>
