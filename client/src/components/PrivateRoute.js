@@ -1,18 +1,21 @@
-import React from 'react';
-import { Navigate } from 'react-router-dom';
-// import { /  } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { useLocation, Navigate } from "react-router-dom";
 
-import auth from '../services/auth';
+function PrivateRoute({ children }) {
+  let auth = useAuth();
+  let location = useLocation();
 
-// const PrivateWrapper = () => {
-//   return auth.isAuthenticated ? <Outlet /> : <Navigate to="/login" />;
-// };
+  if (!auth.isAuthenticated) {
+    // Redirect them to the /login page, but save the current location they were
+    // trying to go to when they were redirected. This allows us to send them
+    // along to that page after they login, which is a nicer user experience
+    // than dropping them off on the home page.
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
 
-const PrivateRoute = ({callbackURL, children}) => {
-  // console.log(callbackURL)
-  // let cburl = "/login?loggedout&callbackURL=" + callbackURL;
-  return auth.isAuthenticated ? children : <Navigate to={'/login?loggedout'} />;
-};
+  return children;
+}
+
 
 // const PrivateRoute = ({ component: Component, ...rest }) => (
 //   <Route {...rest} render={(props) => (

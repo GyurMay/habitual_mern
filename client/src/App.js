@@ -8,11 +8,18 @@ import HabitsListPage from "./pages/HabitsListPage";
 import ShowHabitPage from "./pages/ShowHabitPage";
 import LoginPage from "./pages/LoginPage";
 import PrivateRoute from './components/PrivateRoute';
+import { AuthProvider } from "./context/AuthContext";
+import AuthButton from "./components/AuthButton";
+import {NavBar, ExpandMenuBtn} from "./components/NavBar";
+import Profile from "./pages/Profile";
 
 function Navigation(props) {
   return (
+<>
+<NavBar />
     <nav className="navbar navbar-expand-sm navbar-dark bg-dark shadow mb-3">
       <div className="container-fluid">
+        <ExpandMenuBtn />
         <Link className="navbar-brand" to="/">
           Home
         </Link>
@@ -28,20 +35,22 @@ function Navigation(props) {
             </NavLink>
           </li>
           <li className="nav-item">
-            <NavLink className="nav-link" to="/Login">
-              Login
-            </NavLink>
+            <AuthButton style={{}} />
           </li>
         </ul>
       </div>
     </nav>
+    </>
   );
+ 
 }
 
 function App() {
   return (
+    <AuthProvider>
     <BrowserRouter>
-      <Navigation />
+    <div id="main">
+      <NavBar />
       <div className="container-xl text-center">
         <div className="row justify-content-center">
           <Routes>
@@ -49,16 +58,19 @@ function App() {
             <PrivateRoute path="/habits/:id" component={<ShowHabitPage />} />
             <PrivateRoute path="/" component={<HabitsListPage />} /> */}
             
-            <Route path="/habits/new" element={<PrivateRoute><HabitFormPage /></PrivateRoute>} />
-            <Route path="/habits/:id" element={({params}) => {<PrivateRoute callbackURL={params.id}><ShowHabitPage /></PrivateRoute>}} />
+            <Route path="/habits/:id" element={<PrivateRoute><ShowHabitPage /></PrivateRoute>} />
             <Route path="/" element={<PrivateRoute><HabitsListPage /></PrivateRoute>}  />
-              
+
+            <Route path="/create/:makeHabit" element={<PrivateRoute><HabitFormPage /></PrivateRoute>} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/about-us" element={<AboutUsPage />} />
             <Route path="/login" element={<LoginPage />} />
           </Routes>
         </div>
       </div>
+    </div>
     </BrowserRouter>
+    </AuthProvider>
   );
 }
 

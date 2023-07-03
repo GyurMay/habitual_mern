@@ -1,23 +1,31 @@
-import auth from '../services/auth.js';
+import { useAuth } from '../context/AuthContext.js';
+// import auth from '../services/auth.js';
 import {useState} from 'react';
-
+import { useNavigate, useLocation } from 'react-router-dom';
 // let error = false;
 
 
 export default function LoginPage(props){
   const [error, setError] = useState(false);
 
+  const navigate = useNavigate();
+  const location = useLocation();
+  const auth = useAuth();
+
+  const from = location.state?.from?.pathname || "/";
+
   async function handleSubmit(e){
     e.preventDefault();
     const [username, password] = [document.querySelector('#username').value ,document.querySelector('#password').value];
-    auth.authenticate(username, password)
-      .then((user) => {
-        document.location = '/';
-      })
-      .catch((err) => {
+    
+    try{
+        await auth.authenticate(username, password);
+        navigate(from);
+    }catch(err) {
         // this.setState({ failed: true });
         setError(true);
-      });
+      };
+    
   }
   function ErrorAlert(props){
     return (
@@ -27,7 +35,7 @@ export default function LoginPage(props){
 
     return (
         <>
-      {error && <ErrorAlert details={"Failed to save the content"} />}
+      {error && <ErrorAlert details={"Login failed"} />}
       {document.location.href.includes('loggedout') && <ErrorAlert details={"Log in to view page"} />}
     <form onSubmit={handleSubmit}>
       <div class="form-group">

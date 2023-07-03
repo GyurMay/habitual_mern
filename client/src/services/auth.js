@@ -28,7 +28,7 @@ const auth = {
         });
     },
     signout(cb) {
-      return fetch('/logout', { 
+      return fetch('/api/logout', { 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

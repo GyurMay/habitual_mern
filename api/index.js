@@ -23,7 +23,14 @@ mongoose.connect('mongodb://127.0.0.1:27017/HabitualDB')
 require('dotenv').config();
 
 //generic template start
-  
+const cors = require('cors');
+
+app.use(cors({
+    origin: "http://localhost:3000",
+    method: ['POST, GET']
+}));
+
+
 const PORT = process.env.PORT;
 
 //has to be used after the body-parser inorder to sanitize
@@ -45,15 +52,15 @@ const logFormat = process.env.NODE_ENV === "production" ? "combined" : "dev";
 app.use(morgan(logFormat));
 
 // for production use, we serve the static react build folder
-// if (process.env.NODE_ENV === "production") {
-//   app.use(express.static(path.join(__dirname, "../client/build")));
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../client/build")));
 
-//   // all unknown routes should be handed to our react app
-//   app.get("*", function (req, res) {
-//     res.sendFile(path.join(__dirname, "../client/build", "index.html"));
-//   });
-// }
-app.use(express.static(path.join(__dirname, "../client/build")));
+  // all unknown routes should be handed to our react app
+  app.get("*", function (req, res) {
+    res.sendFile(path.join(__dirname, "../client/build", "index.html"));
+  });
+}
+// app.use(express.static(path.join(__dirname, "../client/build")));
 
   // all unknown routes should be handed to our react app
   app.get("*", function (req, res) {
@@ -97,8 +104,8 @@ app.get("/api/habit/:id", (req, res) => {
     });
 })
 
-app.post("/api/habit/:id/update?newhabit=:newhabit", (req, res) => {
-  Habits.update({habits: {$elemMatch: { habitId: parseInt(req.params.id) }}}, {$set: {"habits.$": JSON.parse(req.params.newhabit)}} )
+app.post("/api/habit/:id/update", (req, res) => {
+  Habits.update({habits: {$elemMatch: { habitId: parseInt(req.params.id) }}}, {$set: {"habits.$": JSON.parse(req.body.newhabit)}} )
     .then(dpc => {
       res.status(200).json(doc);
     }).catch(error => {
