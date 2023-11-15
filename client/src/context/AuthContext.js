@@ -5,7 +5,8 @@ const { Provider } = AuthContext;
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(false);
-  let host = 'http://localhost:3001'
+  // const [currHabit, setCurrHabit] = useState()
+  let host = 'http://localhost:3001' // since the backend is hosted on a diff port
   // host = '';
   useEffect(() => {
     async function checkIfUserIsLoggedIn() {
@@ -72,9 +73,9 @@ const AuthProvider = ({ children }) => {
       value={{
         authenticate,
         signout,
-        // isAuthenticated: user ? true : false,
-        isAuthenticated: true,
-        user,
+        isAuthenticated: user ? true : false,
+        // isAuthenticated: true,
+        user
       }}
     >
       {children}

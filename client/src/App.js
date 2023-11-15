@@ -17,13 +17,13 @@ function Navigation(props) {
   return (
 <>
 <NavBar />
-    <nav className="navbar navbar-expand-sm navbar-dark bg-dark shadow mb-3">
+    {/* <nav className="navbar navbar-expand-sm navbar-dark bg-dark shadow mb-3">
       <div className="container-fluid">
         <ExpandMenuBtn />
         <Link className="navbar-brand" to="/">
           Home
         </Link>
-        <ul className="navbar-nav me-auto">
+        <ul className="navbar-nav">
           <li className="nav-item">
             <NavLink className="nav-link" to="/habits/new">
               Create
@@ -39,7 +39,7 @@ function Navigation(props) {
           </li>
         </ul>
       </div>
-    </nav>
+    </nav> */}
     </>
   );
  
@@ -51,18 +51,15 @@ function App() {
     <BrowserRouter>
     <div id="main">
       <NavBar />
+      {/* <NavBar /> */}
       <div className="container-xl text-center">
         <div className="row justify-content-center">
           <Routes>
-            {/* <PrivateRoute path="/habits/new" component={<HabitFormPage />} />
-            <PrivateRoute path="/habits/:id" component={<ShowHabitPage />} />
-            <PrivateRoute path="/" component={<HabitsListPage />} /> */}
-            
             <Route path="/habits/:id" element={<PrivateRoute><ShowHabitPage /></PrivateRoute>} />
             <Route path="/" element={<PrivateRoute><HabitsListPage /></PrivateRoute>}  />
 
             <Route path="/create/:makeHabit" element={<PrivateRoute><HabitFormPage /></PrivateRoute>} />
-            <Route path="/profile" element={<Profile />} />
+            <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
             <Route path="/about-us" element={<AboutUsPage />} />
             <Route path="/login" element={<LoginPage />} />
           </Routes>

@@ -27,7 +27,8 @@ const cors = require('cors');
 
 app.use(cors({
     origin: "http://localhost:3000",
-    method: ['POST, GET']
+    method: ['POST, GET'],
+    credentials: true
 }));
 
 
@@ -56,16 +57,16 @@ if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../client/build")));
 
   // all unknown routes should be handed to our react app
-  app.get("*", function (req, res) {
-    res.sendFile(path.join(__dirname, "../client/build", "index.html"));
-  });
+  // app.get("*", function (req, res) {
+  //   res.sendFile(path.join(__dirname, "../client/build", "index.html")); //temp
+  // });
 }
 // app.use(express.static(path.join(__dirname, "../client/build")));
 
   // all unknown routes should be handed to our react app
-  app.get("*", function (req, res) {
-    res.sendFile(path.join(__dirname, "../client/build", "index.html"));
-  });
+  // app.get("*", function (req, res) {
+  //   res.sendFile(path.join(__dirname, "../client/build", "index.html")); //temp
+  // });
 
   // Habits.create({userId: 2,habits: [{ habitId: 102, makeHabit: '100m x 10 dash', breakHabit: 'No high calorie intake', progress: 50, daysRemaining: 5, streak: 0, days: 6}]});
   
@@ -80,9 +81,8 @@ if (PORT) {
 app.get("/home", 
   passport.isAuthenticated(),
   (req, res) => {
-    // console.log(Habits)  
-    // console.log(req.session, userObj)
     let uId = req.session.passport.user;
+    console.log(uId)
     Habits.findOne({userId: uId})
     .then(docs => {
       res.status(200).json({
@@ -95,7 +95,25 @@ app.get("/home",
     });
 });
 
-app.get("/api/habit/:id", (req, res) => {
+app.post("/api/habit/create", 
+  passport.isAuthenticated(),
+  (req, res) => {
+     let uId = req.user;
+     console.log("userid", uId)
+     let content = req.body;
+     Habits.findOne({userId: uId})
+            .then(r => {
+              Habits.updateOne({userId: uId}, {$push: {habits: content}})
+                .then(r => res.status(200).json(r))
+                .catch(e => res.status(500).json({error: 'couldnt update habit list'}))
+            })
+            .catch(e => res.status(500).json({error: e}))
+      console.log("reached")
+});
+
+app.get("/api/habit/:id",
+  passport.isAuthenticated(),
+  (req, res) => {
   Habits.findOne({habits: {$elemMatch: { habitId: parseInt(req.params.id) }}})
     .then(r => {
       res.status(200).json(r)
@@ -104,9 +122,11 @@ app.get("/api/habit/:id", (req, res) => {
     });
 })
 
-app.post("/api/habit/:id/update", (req, res) => {
+app.post("/api/habit/:id/update", 
+passport.isAuthenticated(),
+(req, res) => {
   Habits.update({habits: {$elemMatch: { habitId: parseInt(req.params.id) }}}, {$set: {"habits.$": JSON.parse(req.body.newhabit)}} )
-    .then(dpc => {
+    .then(doc => {
       res.status(200).json(doc);
     }).catch(error => {
       res.status(500).json({ error: error });
@@ -118,15 +138,27 @@ app.post('/api/login',
   (req, res) => {
     // If this function gets called, authentication was successful.
     // `req.user` contains the authenticated user.
-    res.json(req.user);
+    
+    /* if(req.user === 'dorjee' && req.password === 'hi'){
+    //   res.json(req.user);
+    } */ 
+    res.json(req.user)
   });
+app.get('/api/login',
+  (req, res) => {
+    if(req.user){
+       res.json(req.user)
+    }else{
+      res.sendStatus(401);
+    }
+});
 
 app.post('/api/logout', 
-passport.isAuthenticated(),
-function(req, res, next){
-  req.logout((err) => {
-    if (err) { return next(err); }
-    // res.redirect('/');
-  });
+  passport.isAuthenticated(),
+  function(req, res, next){
+    req.logout((err) => {
+      if (err) { return next(err); }
+      // res.redirect('/');
+    });
   res.status(200).json({ message: 'Logout successful' });
 });

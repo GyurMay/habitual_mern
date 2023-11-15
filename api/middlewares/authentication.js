@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
-const User = require('../models/User');
+const Users = require('../models/User');
 
 function passwordsMatch(submittedPassword, storedPasswordHash) {
   return bcrypt.compareSync(submittedPassword, storedPasswordHash);
@@ -24,7 +24,7 @@ passport.use(new LocalStrategy({
   (username, password, done) => {
     // console.log(username, password, "received-----")
     // password = bcrypt.hashSync(password, 10);
-    User.findOne({ username })
+    Users.findOne({ username })
       .then((user) => {
         if(!user) {
           console.log('\n\nFailed Login: user does not exist\n\n');
@@ -44,12 +44,14 @@ passport.use(new LocalStrategy({
 );
 
 passport.serializeUser((user, done) => {
-  done(null, user._id);
+  done(null, user.id);
 });
 
 passport.deserializeUser((id, done) => {
-  User.findOne({_id: id})
+  console.log(id, ":id from passport.deserialize outside")
+  Users.findOne({id: id})
     .then((user) => {
+      console.log(user, "from passport.deserialize")
       if (!user) {
         done(null, false);
         return;
@@ -63,7 +65,14 @@ passport.deserializeUser((id, done) => {
 
 // Use this protect api routes that require a user to be logged in.
 passport.isAuthenticated = () => 
-  (req, res, next) => (req.user ? next() : res.sendStatus(401));
+  (req, res, next) => {
+    console.log("authenticated", req.user)
+    if(req.user){
+      return next()
+    }else{
+      res.sendStatus(401)
+    }
+  };
 
 
 module.exports = passport;

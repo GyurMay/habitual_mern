@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom"
 
 
@@ -14,7 +14,7 @@ const userDB = {
             "days": 6
         },
         {
-            "habitId":101,
+            "habitId": 101,
             "makeHabit": "Curl ups",
             "breakHabit": "",
             "progress": 0,
@@ -22,19 +22,25 @@ const userDB = {
             "days": 12
         },
         {
-            "habitId":102,
+            "habitId": 102,
             "makeHabit": "Pull ups",
             "breakHabit": "",
             "progress": 0,
             "streak": 0,
             "days": 14
-        },
+        }
 ]}
 
 export default function ShowHabitPage(props){
   const params = useParams();
+  
+  useEffect(() => {
+    setCurrHabit(userDB.habits.find(x => x.habitId == params.id));
+    return () => setCurrHabit(null)
+  }, [params]);
+
     //parseInt(document.querySelector(`.navList.active.currHabit`).id.slice(1))
-    const [currHabit, setCurrHabit] = useState(userDB.habits.find(x => x.habitId == params.id));
+  const [currHabit, setCurrHabit] = useState(userDB.habits.find(x => x.habitId == params.id));
   const [count, setCount] = useState(0); //Streak count 
   var [highestCount, setHighestCount] = useState(0);
 //   console.log(userDB.habits, habitInx);
@@ -45,98 +51,44 @@ export default function ShowHabitPage(props){
   const [logged, setLogged] = useState(0)
 // console.log(parseInt(document.querySelector(`.navList.active.currHabit`).id.slice(1)))
 //   setCurrHabit(parseInt(document.querySelector(`.navList.active.currHabit`).id.slice(1)))
-
 function Log() {
-    setCount(count + 1);  
-    setLogged(1); 
-    
-    if (progress < initDays ) {
-      setProgress(progress + 1);
-    } 
+  setCount(count + 1); setLogged(1); if (progress < initDays) setProgress(progress + 1); CheckGoal(0);
+}
 
-    CheckGoal(0);
-    }   
+function logCheck() { 
+  return (logged === 0 && currHabit.days !== 0) ? (<button className="btn btn-success mx-3" onClick={() => Log()}> Log </button>) : (<p></p>);
+}
 
-  function logCheck() { 
-    if (logged === 0 && currHabit.days !== 0) {
-      return (<button className = "btn btn-success mx-3"
-            onClick={() => Log() }
-            > Log </button>);
-    } else {
-      return(<p></p>);
-    }
-    
-  }
+function passDay() {
+  if (days > 0) setCurrHabit({...currHabit,days:currHabit.days-1}); if (logged === 0) setCount(0); setLogged(0);
+}
 
-  function passDay() {
-    if (days > 0 ) {
-      setCurrHabit({...currHabit,days:currHabit.days-1});
-    } 
+function Reset() {
+  setCount(0); setDays(initDays); setProgress(0); CheckGoal(); setLogged(0); setHighestCount(0);
+} 
 
-    if (logged === 0) {
-      setCount(0);
-    }  
+function CheckGoal() { 
+  if (days === 0) return (progress === initDays) ? <p className="text-success"> Met </p> : <p className="text-danger"> Not Met </p>;
+  else return <p className="text-primary"> In Progress </p>;
+}
 
-    setLogged(0);
-  }
+function CheckStreak() {
+  return (count > highestCount) ? setHighestCount(count) : highestCount;
+} 
 
-  function Reset() {
-    setCount(0);  
-    setDays(initDays); 
-    setProgress(0); 
-    CheckGoal(); 
-    setLogged(0); 
-    setHighestCount(0);
-  } 
-  // console.log("sdfadsfsaf--------------",userDB.habits[habitInx]["habitId"+currHabit[0]].days)
-  function CheckGoal() { 
+function calcKarma() {
+  return (highestCount * 50) + ((progress / initDays) * 100) * 3;
+} 
 
-    if (days === 0) {
-      if (progress === initDays) {
-        // setGoalMet(true);
-        return <p className="text-success"> Met </p>;
-      } 
-  
-      else {
-        // setGoalMet(false); 
-        return <p className="text-danger"> Not Met </p>;
-      }
-    } 
-
-    else {
-      return <p className="text-primary"> In Progress </p>;
-    }
-  } 
-
-  function CheckStreak() {
-    if (count > highestCount) {
-      setHighestCount(count);
-    } 
-
-    return highestCount;
-  } 
-
-  function calcKarma() {
-    var score = 0; 
-
-    score += (highestCount * 50); 
-    score += ((progress / initDays)  * 100) * 3; 
-
-    return score;
-  } 
-
-  function endStats() {
-    if(days === 0) {
-      return ( 
-      <div>
-        <h1> Highest Streak: {CheckStreak()} </h1>  
-        <h1> Total Progress: {progress * 10}% </h1> 
-        <h1> KARMA Earned: {calcKarma()} </h1> 
-      </div>
-      );
-    }
-  }
-
+function endStats() {
+  return (days === 0) && (
+    <div>
+      <h1> Highest Streak: {CheckStreak()} </h1>  
+      <h1> Total Progress: {progress * 10}% </h1> 
+      <h1> KARMA Earned: {calcKarma()} </h1> 
+    </div>
+  );
+}
 
     return (
         <>
