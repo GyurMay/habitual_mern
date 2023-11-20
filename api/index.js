@@ -1,12 +1,12 @@
 const express = require("express");
 const morgan = require("morgan");
 const path = require("path");
-const bcrypt = require("bcryptjs")
 const passport = require('./middlewares/authentication');
 const expressSession = require('express-session');
 // const db = require("./models");
 const app = express();
 const router = express.Router();
+const bcrypt = require('bcryptjs');
 const expressSanitizer = require('express-sanitizer')
 const Habits = require("./models/Habits");
 
@@ -24,6 +24,7 @@ require('dotenv').config();
 
 //generic template start
 const cors = require('cors');
+const Users = require("./models/User");
 
 app.use(cors({
     origin: "http://localhost:3000",
@@ -98,9 +99,11 @@ app.get("/home",
 app.post("/api/habit/create", 
   passport.isAuthenticated(),
   (req, res) => {
-     let uId = req.user;
+    //sample req.body looks like this => {content: {habitId: 100, makeHabit:"",...}, user: auth.user }
+    // console.log(req.user, "req.user")
+     let uId = req.body.user.id;
      console.log("userid", uId)
-     let content = req.body;
+     let content = req.body.content;
      Habits.findOne({userId: uId})
             .then(r => {
               Habits.updateOne({userId: uId}, {$push: {habits: content}})
@@ -144,6 +147,32 @@ app.post('/api/login',
     } */ 
     res.json(req.user)
   });
+  
+  app.post('/api/register', 
+  (req, res) => {
+    // If this function gets called, authentication was successful.
+    // `req.user` contains the authenticated user.
+    
+    /* if(req.user === 'dorjee' && req.password === 'hi'){
+    //   res.json(req.user);
+    } */ 
+    // console.log(req.body.username, req.body.password)
+    const password = bcrypt.hashSync(req.body.password, 10);
+    Users.create({
+      username: req.body.username,
+      password,
+      name: req.body.name
+    })
+    .then(r => {
+      // res.status(500).end(); {
+      res.status(200).json({name: r._doc.name, username: r._doc.username});
+    })
+    .catch(err => {
+      console.log(err)
+      res.status(500).json(err);
+    })  
+  });
+
 app.get('/api/login',
   (req, res) => {
     if(req.user){

@@ -38,16 +38,31 @@ const AuthProvider = ({ children }) => {
       headers: {
         "Content-Type": "application/json",
       },
-    }); 
+    });
+
 
     if (!response.ok) {
       throw new Error("Login Failed");
     }
 
     let loggedInUser = await response.json();
-    setUser(loggedInUser);
+    setUser({...loggedInUser, password: null}); // prevent the password from being sent
 
     return loggedInUser;
+  };
+
+  
+  const register = async (username, password, name) => {
+    let response = await fetch(host+"/api/register", {
+      method: "POST",
+      body: JSON.stringify({ username, password ,name }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (!response.ok) {
+      throw new Error("Register Failed");
+    }
   };
 
   const signout = async () => {
@@ -72,6 +87,7 @@ const AuthProvider = ({ children }) => {
     <Provider
       value={{
         authenticate,
+        register,
         signout,
         isAuthenticated: user ? true : false,
         // isAuthenticated: true,

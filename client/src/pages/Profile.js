@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../index.css"; 
-
+import { useAuth } from "../context/AuthContext";
 // console.log(JSON.stringify(userHabitsStats))
 export default function Profile (props) {
     const userDB = {
@@ -31,11 +31,17 @@ export default function Profile (props) {
             "days": 14
         },
 ]}
+    // const currUser = {
+    //     imgSrc: 'https://images.unsplash.com/photo-1615497001839-b0a0eac3274c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8Y3V0ZSUyMGNhdHxlbnwwfHwwfHw%3D&w=1000&q=80',
+    //     name: 'Dorjee Lama',
+    //     motto: 'DD Hard work'
+    // };
+    const auth = useAuth();
     const currUser = {
         imgSrc: 'https://images.unsplash.com/photo-1615497001839-b0a0eac3274c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8Y3V0ZSUyMGNhdHxlbnwwfHwwfHw%3D&w=1000&q=80',
-        name: 'Dorjee Lama',
-        motto: 'DD Hard work'
-    };
+        ...auth.user
+    }
+    console.log(currUser)
     return (
         <>
         {/* <NavBar /> */}

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function HabitFormPage(props){
 
   const params = useParams();
+  const auth = useAuth();
   
   const [mh, setMh] = useState(params.makeHabit);
   const [bh, setBh] = useState("");
@@ -29,7 +31,7 @@ export default function HabitFormPage(props){
       const response = await fetch(host+'/api/habit/create', {
         method: "POST",
         credentials: "include",
-        body: JSON.stringify(jsonObj),
+        body: JSON.stringify({content: jsonObj, user: auth.user }),
         headers: {
           "Content-Type": "application/json"
         }
